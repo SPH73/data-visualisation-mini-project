@@ -12,6 +12,7 @@ function makeGraphs(error, salaryData) {
     show_discipline_selector(ndx);
     show_gender_balance(ndx);
     show_average_salary(ndx);
+    show_rank_distribution(ndx);
     
     dc.renderAll();
 }
@@ -86,6 +87,54 @@ function show_average_salary(ndx) {
         .elasticY(true)
         .xAxisLabel("Gender")
         .yAxis().ticks(4);
-
 }
 
+function show_rank_distribution(ndx){
+    var dim = ndx.dimension(dc.pluck('sex'));
+
+    function rankByGender(dimension, rank){
+        return dimension.group().reduce(
+            function (p,v){
+                p.total++;
+                if(v.rank == rank){
+                    p.match++
+                }
+                return p;
+            },
+            function (p,v){
+                p.total--;
+                if(v.rank == rank){
+                    p.match--
+                }
+                return p;
+            },
+    
+            function (){
+                return {total:0, count:0, match:0};
+            }
+        );
+    }
+
+    var profByGender = rankByGender(dim, "Prof");
+    var asstProfByGender = rankByGender(dim, "AsstProf");
+    var assocProfByGender = rankByGender(dim, "AssocProf");
+
+    dc.barChart("#rank-distribution")
+    .width(400)
+    .height(300)
+    .dimension(dim)
+    .group(profByGender, "Prof")
+    .stack(asstProfByGender, "AsstProf")
+    .stack(assocProfByGender, "AssocProf")
+    .valueAccessor(function(d){
+        if(d.value.match > 0){
+            return (d.value.match / d.value.total) * 100;
+        } else{
+            return 0;
+        }
+    })
+    .x(d3.scale.ordinal())
+    .xUnits(dc.units.ordinal)
+    .legend(dc.legend().x(320).y(20).itemHeight(15).gap(5))
+   .margins({top: 10, right: 100, bottom: 30, left: 50})
+}
