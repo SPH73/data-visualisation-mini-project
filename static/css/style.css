@@ -1,10 +1,10 @@
-
-body{
+body {
     margin-top: 30px;
 }
 
 h3 {
-text-align: center;
+    text-align: center;
+    border: none;
 }
 
 div {
@@ -21,10 +21,10 @@ div {
     line-height: normal;
 }
 
-p{
+p {
     font-size: 20px;
 }
 
-#discipline-selector{
+#discipline-selector {
     border: none;
 }
